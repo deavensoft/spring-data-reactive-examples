@@ -39,6 +39,15 @@ public class PersonControllerTest {
                   .block();
     }
 
+	@Test
+	public void testGetPerson() {
+		client.get().uri("/persons/{id}", Persons.get(0).getId())
+				.exchange()
+				.expectStatus().isOk()
+				.expectBody(Person.class)
+				.consumeWith(System.out::println);
+	}
+
     @Test
     public void testGetAllPersons() {
         client.get().uri("/persons/")
@@ -52,29 +61,37 @@ public class PersonControllerTest {
     }
 
     @Test
-    public void testGetPerson() {
-        client.get().uri("/persons/{id}", Persons.get(0).getId())
-              .exchange()
-              .expectStatus().isOk()
-              .expectBody(Person.class)
-              .consumeWith(System.out::println);
-    }
-
-    @Test
     public void testCreatePerson() {
-        Person Person = new Person("1", "Petar", "Petrovic");
+        Person person = new Person(null, "Petar", "Petrovic");
 
         client.post().uri("/persons/")
-              .contentType(MediaType.APPLICATION_JSON_UTF8)
-              .accept(MediaType.APPLICATION_JSON_UTF8)
-              .body(Mono.just(Person), Person.class)
+              .contentType(MediaType.APPLICATION_JSON)
+              .accept(MediaType.APPLICATION_JSON)
+              .body(Mono.just(person), Person.class)
               .exchange()
               .expectStatus().isCreated()
-              .expectHeader().contentType(MediaType.APPLICATION_JSON_UTF8)
+              .expectHeader().contentType(MediaType.APPLICATION_JSON)
               .expectBody()
               .jsonPath("$.id").isNotEmpty()
               .jsonPath("$.firstName").isEqualTo("Petar")
               .jsonPath("$.lastName").isEqualTo("Petrovic")
               .consumeWith(System.out::println);
     }
+
+	@Test
+	public void testCreatePersons() {
+		Person person1 = new Person(null, "Petar", "Petrovic");
+		Person person2 = new Person(null, "Ivan", "Dimitrijevic");
+
+		client.post().uri("/persons/bulk")
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON)
+				.body(Flux.just(person1, person2), Person.class)
+				.exchange()
+				.expectStatus().isCreated()
+				.expectHeader().contentType(MediaType.APPLICATION_JSON)
+				.expectBody()
+				.jsonPath("$").value(org.hamcrest.Matchers.hasSize(2))
+				.consumeWith(System.out::println);
+	}
 }

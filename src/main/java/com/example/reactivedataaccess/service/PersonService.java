@@ -20,8 +20,8 @@ public class PersonService {
 		return personMono.flatMap(repository::save).log();
 	}
 
-	public Mono<Void> createPersons(Flux<Person> persons) {
-		return persons.flatMap(repository::save).then(Mono.empty());
+	public Flux<Person> createPersons(Flux<Person> persons) {
+		return persons.flatMap(repository::save);
 	}
 
 	public Mono<Person> getPerson(String personId) {

@@ -26,7 +26,7 @@ public class ExercisesController {
 	 */
 	@PostMapping("/capitalize")
 	Mono<Person> capitalizePerson(@RequestBody Mono<Person> mono) {
-		return null;
+		return null; // FIXME
 	}
 
 	/**
@@ -35,7 +35,7 @@ public class ExercisesController {
 	 */
 	@GetMapping("/ordered")
 	Flux<Person> orderedPersons() {
-		return null;
+		return null; // FIXME
 	}
 
 	/** Return all persons with given first and last name
@@ -43,7 +43,7 @@ public class ExercisesController {
 	 */
 	@GetMapping("/persons")
 	Flux<Person> getPersons(String firstName, String lastName) {
-		return null;
+		return null; // FIXME
 	}
 
 	/**
@@ -51,7 +51,7 @@ public class ExercisesController {
 	 */
 	@GetMapping("/combine")
 	Mono<Void> combinePersons() {
-		return null;
+		return null; // FIXME
 	}
 
 	/**
@@ -59,6 +59,6 @@ public class ExercisesController {
 	 */
 	@GetMapping("/group-by-name")
 	Flux<PersonsWithSameName> groupByName() {
-		return null;
+		return null; // FIXME
 	}
 }

@@ -38,7 +38,7 @@ public class Solutions {
 	 * Using zip operation replace the names of the first 4 persons from the database with values from the names variable
 	 */
 	@GetMapping("/combine")
-	Mono<Void> combinePersons() {
+	Flux<Person> combinePersons() {
 		Flux<Person> personFlux = personService.listPersons();
 		return personService.createPersons(Flux.zip(names, personFlux, (r, p) -> new Person(p.getId(), r, p.getLastName())));
 	}
