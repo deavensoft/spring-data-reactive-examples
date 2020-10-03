@@ -1,5 +1,6 @@
 package com.example.reactivedataaccess.assignment.section1;
 
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
@@ -7,9 +8,17 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
+import static com.example.reactivedataaccess.assignment.section1.Car.Brand.HONDA;
+import static com.example.reactivedataaccess.assignment.section1.Car.Brand.TOYOTA;
+import static com.example.reactivedataaccess.assignment.section1.Car.Brand.VOLKSWAGEN;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 
 
@@ -102,6 +111,11 @@ class Exercise01Test {
 
 
     @Test
+    void subscribeAndPrint_ShouldPrint() {
+        exercise.subscribeAndPrint();
+    }
+
+    @Test
     void hotPublisherOfUpperCaseChars_whenGivenUpperCaseLetters_ShouldDelayElements() {
         Duration delay = Duration.ofSeconds(1);
 
@@ -161,5 +175,53 @@ class Exercise01Test {
                 .expectNext(33)
                 .expectComplete()
                 .verify();
+    }
+
+    @Test
+    void groupCarsByBrand_WithInput_ShouldEmitListsOfSameBrandCars() throws Exception {
+        List<Car> cars = Arrays.asList(
+                new Car(TOYOTA, "Avensis"),
+                new Car(VOLKSWAGEN, "Buba"),
+                new Car(HONDA, "Accord"),
+                new Car(VOLKSWAGEN, "Golf"),
+                new Car(TOYOTA, "Corolla"),
+                new Car(HONDA, "Civic"),
+                new Car(TOYOTA, "Prius"),
+                new Car(VOLKSWAGEN, "Tiguan")
+        );
+
+        Flux<List<Car>> groupedCarsFlux = exercise.groupCarsByBrand(cars);
+
+        CountDownLatch countDownLatch = new CountDownLatch(1);
+        List<List<Car>> result = new ArrayList<>();
+        groupedCarsFlux.subscribe(
+                list -> result.add(list),
+                System.err::println,
+                () -> countDownLatch.countDown());
+
+        countDownLatch.await();
+
+        assertThat(result, hasSize(3));
+
+        for (List<Car> brandCars : result) {
+            if (brandCars.get(0).getBrand().equals(TOYOTA)) {
+                assertThat(brandCars, containsInAnyOrder(
+                        new Car(TOYOTA, "Avensis"),
+                        new Car(TOYOTA, "Corolla"),
+                        new Car(TOYOTA, "Prius")
+                ));
+            } else if (brandCars.get(0).getBrand().equals(HONDA)) {
+                assertThat(brandCars, containsInAnyOrder(
+                        new Car(HONDA, "Accord"),
+                        new Car(HONDA, "Civic")
+                ));
+            } else if (brandCars.get(0).getBrand().equals(VOLKSWAGEN)) {
+                assertThat(brandCars, containsInAnyOrder(
+                        new Car(VOLKSWAGEN, "Buba"),
+                        new Car(VOLKSWAGEN, "Golf"),
+                        new Car(VOLKSWAGEN, "Tiguan")
+                ));
+            }
+        }
     }
 }
