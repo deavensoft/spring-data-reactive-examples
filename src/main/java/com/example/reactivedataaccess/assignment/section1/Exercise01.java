@@ -49,6 +49,9 @@ public class Exercise01 {
     //       l
     //       d
     void subscribeAndPrint() {
+        Flux<Character> characterFlux = coldPublisherOfUpperCaseChars(
+                new Integer[]{72, 69, 76, 76, 79, 32, 87, 79, 82, 76, 68, 33});
+
         // TODO
     }
 

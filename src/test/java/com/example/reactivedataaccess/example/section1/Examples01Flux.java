@@ -1,6 +1,8 @@
 package com.example.reactivedataaccess.example.section1;
 
 import org.junit.jupiter.api.Test;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 import reactor.core.publisher.Flux;
 
 import java.time.Duration;
@@ -120,6 +122,38 @@ class Examples01Flux {
                         i -> System.out.println("Received :: " + i),
                         err -> System.out.println("Error :: " + err),
                         () -> System.out.println("Successfully completed"));
+    }
+
+    @Test
+    void subscriber_WithErrorAndSuccessCallbacks_SubscriberInterface() {
+        Flux.just(1,2,3)
+                .map(i -> 10 / i)
+                .subscribe(new Subscriber<>() {
+
+                    private Subscription subscription;
+
+                    @Override
+                    public void onSubscribe(Subscription s) {
+                        this.subscription = s;
+                        subscription.request(1);
+                    }
+
+                    @Override
+                    public void onNext(Integer i) {
+                        System.out.println("Received :: " + i);
+                        subscription.request(1);
+                    }
+
+                    @Override
+                    public void onError(Throwable err) {
+                        System.err.println("Error :: " + err);
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        System.out.println("Successfully completed");
+                    }
+                });
     }
 
 
