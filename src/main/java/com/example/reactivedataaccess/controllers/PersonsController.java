@@ -24,8 +24,14 @@ import java.time.Duration;
 public class PersonsController {
 	private final PersonService personService;
 
+	@GetMapping("/{id}")
+	public Mono<ResponseEntity<Person>> getPerson(@PathVariable String id) {
+		Mono<Person> personMono = this.personService.getPerson(id);
+		return personMono.map(ResponseEntity::ok).defaultIfEmpty(ResponseEntity.notFound().build());
+	}
+
 	@GetMapping
-	public Flux<Person> listPersons() {
+	public Flux<Person> getPersons() {
 		return personService.listPersons();
 	}
 
@@ -37,14 +43,8 @@ public class PersonsController {
 
 	@ResponseStatus(HttpStatus.CREATED)
 	@PostMapping("/bulk")
-	public Mono<Void> createPersons(@RequestBody Flux<Person> persons) {
+	public Flux<Person> createPersons(@RequestBody Flux<Person> persons) {
 		return personService.createPersons(persons);
-	}
-
-	@GetMapping("/{id}")
-	public Mono<ResponseEntity<Person>> getPerson(@PathVariable String id) {
-		Mono<Person> personMono = this.personService.getPerson(id);
-		return personMono.map(ResponseEntity::ok).defaultIfEmpty(ResponseEntity.notFound().build());
 	}
 
 	@GetMapping(path = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)

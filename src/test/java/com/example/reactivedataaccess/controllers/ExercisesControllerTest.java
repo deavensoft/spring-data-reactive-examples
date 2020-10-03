@@ -23,7 +23,7 @@ class ExercisesControllerTest {
 	@Autowired
 	private PersonRepository repository;
 
-	private List<Person> Persons = Arrays.asList(
+	private List<Person> persons = Arrays.asList(
 			new Person("1", "Petar", "Petrovic"),
 			new Person("2", "Zoran", "Milenkovic"),
 			new Person("3", "Nikola", "Petkovic"),
@@ -33,7 +33,7 @@ class ExercisesControllerTest {
 	@BeforeEach
 	public void setUp() {
 		repository.deleteAll()
-				.thenMany(Flux.fromIterable(Persons))
+				.thenMany(Flux.fromIterable(persons))
 				.flatMap(repository::save)
 				.doOnNext(System.out::println)
 				.then()
@@ -41,12 +41,12 @@ class ExercisesControllerTest {
 	}
 
 	@Test
-	public void transformMono() {
+	public void givenPerson_ShouldCapitalizePersonFirstAndLastName() {
 		Person Person = new Person("1", "Jelena", "Kocic");
 
 		client.post().uri("/exercises/capitalize")
-				.contentType(MediaType.APPLICATION_JSON_UTF8)
-				.accept(MediaType.APPLICATION_JSON_UTF8)
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON)
 				.body(Mono.just(Person), Person.class)
 				.exchange()
 				.expectStatus().isOk()
@@ -56,5 +56,9 @@ class ExercisesControllerTest {
 				.jsonPath("$.firstName").isEqualTo("JELENA")
 				.jsonPath("$.lastName").isEqualTo("KOCIC")
 				.consumeWith(System.out::println);
+	}
+
+	@Test
+	public void givenPersons_ShouldOrderThemByLastNameDesc() {
 	}
 }
