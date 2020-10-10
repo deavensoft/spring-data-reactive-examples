@@ -1,17 +1,21 @@
 package com.example.reactivedataaccess.configuration;
 
-/*
+
+import com.example.reactivedataaccess.controllers.FunctionalJokesController;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.reactive.function.server.RouterFunction;
+import org.springframework.web.reactive.function.server.RouterFunctions;
+import org.springframework.web.reactive.function.server.ServerResponse;
+
+import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
+
 @Configuration
 public class RouterConfig {
 	@Bean
-	public RouterFunction<ServerResponse> route(PersonsController handler) {
+	public RouterFunction<ServerResponse> route(FunctionalJokesController handler) {
 		return RouterFunctions
-				.route(GET("/persons/{id}").and(accept(APPLICATION_JSON)),
-						handler::getPerson)
-				.andRoute(GET("/persons").and(accept(APPLICATION_JSON)),
-						handler::listPersons)
-				.andRoute(POST("/persons").and(contentType(APPLICATION_JSON)),
-						handler::createPerson);
+				.route(GET("/delayedjokes"), handler::getDelayedJokes);
 	}
 }
-*/
+

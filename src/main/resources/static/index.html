@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+    <div style="width:100%; border: 1px solid black;">
+        <p>http://localhost:15000/streamjokes?jokesCount=10&delayInSeconds=5</p>
+    </div>
+    <div style="width:100%; border: 1px solid black;">
+        <ul id="list1"></ul>
+    </div>
+    <div style="width:100%; border: 1px solid black;">
+        <p>http://localhost:15000/delayedjokes</p>
+    </div>
+    <div style="width:100%; border: 1px solid black;">
+        <ul id="list2"></ul>
+    </div>
+    <div style="width:100%; border: 1px solid black;">
+        <p>ws://localhost:15000/wsjokesemitter</p>
+    </div>
+    <div style="width:100%; border: 1px solid black;">
+        <ul id="list3"></ul>
+    </div>
+    <div style="width:100%; border: 1px solid black;">
+        <p>ws://localhost:7000/rsocketjokes</p>
+    </div>
+    <div style="width:100%; border: 1px solid black;">
+        <ul id="list4"></ul>
+    </div>
+<div id="rsocketmessages">
+
+</div>
+<script>
+	const evtSource = new EventSource("http://localhost:15000/streamjokes?jokesCount=10&delayInSeconds=5");
+
+		evtSource.onmessage = function(event) {
+			const newElement = document.createElement("li");
+			const eventList = document.getElementById("list1");
+
+			newElement.innerHTML = "source 1 - message: " + event.data;
+			eventList.appendChild(newElement);
+		}
+
+		const evtSource2 = new EventSource("http://localhost:15000/delayedjokes");
+
+		evtSource2.onmessage = function(event) {
+			const newElement = document.createElement("li");
+			const eventList = document.getElementById("list2");
+
+			newElement.innerHTML = "source 2 - message: " + event.data;
+			eventList.appendChild(newElement);
+		}
+</script>
+
+
+<script>
+	var clientWebSocket = new WebSocket("ws://localhost:15000/wsjokesemitter");
+	clientWebSocket.onopen = function() {
+		console.log("clientWebSocket.onopen", clientWebSocket);
+		console.log("clientWebSocket.readyState", "websocketstatus");
+		clientWebSocket.send("hello-from-browser");
+	}
+	clientWebSocket.onclose = function(event) {
+		console.log("clientWebSocket.onclose", clientWebSocket, event);
+		events("Closing connection");
+	}
+	clientWebSocket.onerror = function(event) {
+		console.log("clientWebSocket.onerror", clientWebSocket, event);
+		events("An error occured");
+	}
+	clientWebSocket.onmessage = function(event) {
+		console.log("clientWebSocket.onmessage", clientWebSocket, event);
+		events(event.data);
+        clientWebSocket.send("Thanks for the joke!")
+	}
+	function events(responseEvent) {
+        const newElement = document.createElement("li");
+        const eventList = document.getElementById("list3");
+
+        newElement.innerHTML = "websocket - message: " + responseEvent;
+        eventList.appendChild(newElement);
+	}
+</script>
+<script src="http://localhost:15000/app.js"></script>
+</html>

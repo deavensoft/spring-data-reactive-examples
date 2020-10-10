@@ -3,11 +3,11 @@ package com.example.reactivedataaccess.service;
 import com.example.reactivedataaccess.dao.PersonRepository;
 import com.example.reactivedataaccess.model.Person;
 import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-@Component
+@Service
 @AllArgsConstructor
 public class PersonService {
 	private final PersonRepository repository;
@@ -29,6 +29,10 @@ public class PersonService {
 	}
 
 	public Flux<Person> findByFirstnameAndLastname(String firstName, String lastName) {
-		return null;
+		return repository.findByFirstNameAndLastName(firstName, lastName);
+	}
+
+	public Flux<Person> findByFirstname(String firstName) {
+		return repository.findByFirstName(firstName);
 	}
 }
